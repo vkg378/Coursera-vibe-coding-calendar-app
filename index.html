@@ -3,55 +3,94 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendar App</title>
+  <title>Calendar</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-wrapper">
-    <!-- Header -->
-    <header class="app-header">
-      <h1 class="app-title">Calendar</h1>
-      <div class="nav-controls">
-        <button class="btn btn-icon" id="btn-prev" aria-label="Previous month">&#8249;</button>
-        <button class="btn btn-ghost" id="btn-today">Today</button>
-        <button class="btn btn-icon" id="btn-next" aria-label="Next month">&#8250;</button>
-      </div>
-      <div class="month-label" id="month-label"></div>
-    </header>
 
-    <!-- Calendar -->
-    <main class="calendar-container">
-      <!-- Weekday row -->
+  <!-- ── Top Bar ─────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-start">
+      <button class="icon-btn" id="btn-menu" aria-label="Main menu">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
+      </button>
+      <div class="logo">
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <rect x="1" y="5" width="34" height="30" rx="3" fill="white" stroke="#dadce0"/>
+          <rect x="1" y="5" width="34" height="11" rx="3" fill="#1a73e8"/>
+          <rect x="1" y="12" width="34" height="4" fill="#1a73e8"/>
+          <rect x="10" y="1" width="4" height="9" rx="2" fill="#4285f4"/>
+          <rect x="22" y="1" width="4" height="9" rx="2" fill="#4285f4"/>
+          <text x="18" y="30" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8" font-family="sans-serif">CAL</text>
+        </svg>
+        <span class="logo-text">Calendar</span>
+      </div>
+    </div>
+
+    <div class="topbar-mid">
+      <button class="btn-today-pill" id="btn-today">Today</button>
+      <button class="icon-btn nav-arrow" id="btn-prev" aria-label="Previous month">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
+      </button>
+      <button class="icon-btn nav-arrow" id="btn-next" aria-label="Next month">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
+      </button>
+      <h1 class="topbar-month" id="month-label"></h1>
+    </div>
+
+    <div class="topbar-end">
+      <button class="icon-btn" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+      </button>
+      <button class="icon-btn" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── App Body ───────────────────────────────────────── -->
+  <div class="app-body">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <button class="btn-create" id="btn-create-sidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+        <span>Create</span>
+      </button>
+      <div class="mini-cal" id="mini-cal"></div>
+    </aside>
+
+    <!-- Main calendar -->
+    <main class="cal-main">
       <div class="weekday-row" id="weekday-row"></div>
-      <!-- Day cells -->
       <div class="calendar-grid" id="calendar-grid"></div>
     </main>
+
   </div>
 
-  <!-- Modal overlay -->
+  <!-- ── Event Modal ────────────────────────────────────── -->
   <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
     <div class="modal" id="modal">
       <div class="modal-header">
         <h2 class="modal-title" id="modal-title">Add Event</h2>
-        <button class="btn btn-icon modal-close" id="btn-modal-close" aria-label="Close modal">&times;</button>
+        <button class="icon-btn modal-close" id="btn-modal-close" aria-label="Close modal">
+          <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+        </button>
       </div>
 
       <form class="modal-form" id="event-form" novalidate>
-        <!-- Title -->
         <div class="form-group">
           <label for="field-title">Title <span class="required">*</span></label>
-          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Event title" autocomplete="off" />
+          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Add title" autocomplete="off" />
           <span class="field-error" id="err-title"></span>
         </div>
 
-        <!-- Date -->
         <div class="form-group">
           <label for="field-date">Date <span class="required">*</span></label>
           <input type="date" id="field-date" name="date" />
           <span class="field-error" id="err-date"></span>
         </div>
 
-        <!-- Start / End Time -->
         <div class="form-row">
           <div class="form-group">
             <label for="field-start">Start Time <span class="required">*</span></label>
@@ -65,33 +104,30 @@
           </div>
         </div>
 
-        <!-- Description -->
         <div class="form-group">
           <label for="field-desc">Description</label>
-          <textarea id="field-desc" name="description" maxlength="500" rows="3" placeholder="Optional details..."></textarea>
+          <textarea id="field-desc" name="description" maxlength="500" rows="3" placeholder="Add description"></textarea>
           <div class="char-counter"><span id="desc-count">0</span> / 500</div>
           <span class="field-error" id="err-desc"></span>
         </div>
 
-        <!-- Color -->
         <div class="form-group">
           <label>Color</label>
           <div class="color-swatches" id="color-swatches"></div>
         </div>
 
-        <!-- Actions -->
         <div class="modal-actions">
           <button type="button" class="btn btn-danger" id="btn-delete" hidden>Delete</button>
           <div class="modal-actions-right">
             <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="btn-save">Save Event</button>
+            <button type="submit" class="btn btn-primary" id="btn-save">Save</button>
           </div>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Toast notification -->
+  <!-- Toast -->
   <div class="toast" id="toast" aria-live="polite"></div>
 
   <script src="app.js"></script>

@@ -97,6 +97,82 @@ function renderHeader() {
   label.textContent = `${MONTH_NAMES[state.currentMonth]} ${state.currentYear}`;
 }
 
+function renderMiniCalendar() {
+  const container = document.getElementById('mini-cal');
+  if (!container) return;
+  container.innerHTML = '';
+
+  // Header: prev | "Month Year" | next
+  const header = document.createElement('div');
+  header.className = 'mini-cal-header';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'icon-btn mini-nav';
+  prevBtn.setAttribute('aria-label', 'Previous month');
+  prevBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>`;
+  prevBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    state.currentMonth--;
+    if (state.currentMonth < 0) { state.currentMonth = 11; state.currentYear--; }
+    renderAll();
+  });
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'icon-btn mini-nav';
+  nextBtn.setAttribute('aria-label', 'Next month');
+  nextBtn.innerHTML = `<svg viewBox="0 0 24 24" width="16" height="16"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>`;
+  nextBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    state.currentMonth++;
+    if (state.currentMonth > 11) { state.currentMonth = 0; state.currentYear++; }
+    renderAll();
+  });
+
+  const monthSpan = document.createElement('span');
+  monthSpan.className = 'mini-cal-month-label';
+  monthSpan.textContent = `${MONTH_NAMES[state.currentMonth]} ${state.currentYear}`;
+
+  header.appendChild(prevBtn);
+  header.appendChild(monthSpan);
+  header.appendChild(nextBtn);
+  container.appendChild(header);
+
+  // Weekday labels: S M T W T F S
+  const wRow = document.createElement('div');
+  wRow.className = 'mini-cal-weekdays';
+  ['S','M','T','W','T','F','S'].forEach(d => {
+    const cell = document.createElement('span');
+    cell.className = 'mini-wd';
+    cell.textContent = d;
+    wRow.appendChild(cell);
+  });
+  container.appendChild(wRow);
+
+  // Day grid
+  const grid = document.createElement('div');
+  grid.className = 'mini-cal-days';
+  getCalendarDays(state.currentYear, state.currentMonth).forEach(date => {
+    const btn = document.createElement('button');
+    btn.className = 'mini-day';
+    if (date.getMonth() !== state.currentMonth) btn.classList.add('other-month');
+    if (isToday(date)) btn.classList.add('today');
+    btn.textContent = date.getDate();
+    btn.addEventListener('click', () => {
+      state.currentYear  = date.getFullYear();
+      state.currentMonth = date.getMonth();
+      renderAll();
+    });
+    grid.appendChild(btn);
+  });
+  container.appendChild(grid);
+}
+
+function renderAll() {
+  renderHeader();
+  renderGrid();
+  renderMiniCalendar();
+}
+
 function renderWeekdayRow() {
   const row = document.getElementById('weekday-row');
   row.innerHTML = '';
@@ -403,29 +479,20 @@ function attachGlobalListeners() {
   // Month navigation
   document.getElementById('btn-prev').addEventListener('click', () => {
     state.currentMonth--;
-    if (state.currentMonth < 0) {
-      state.currentMonth = 11;
-      state.currentYear--;
-    }
-    renderHeader();
-    renderGrid();
+    if (state.currentMonth < 0) { state.currentMonth = 11; state.currentYear--; }
+    renderAll();
   });
 
   document.getElementById('btn-next').addEventListener('click', () => {
     state.currentMonth++;
-    if (state.currentMonth > 11) {
-      state.currentMonth = 0;
-      state.currentYear++;
-    }
-    renderHeader();
-    renderGrid();
+    if (state.currentMonth > 11) { state.currentMonth = 0; state.currentYear++; }
+    renderAll();
   });
 
   document.getElementById('btn-today').addEventListener('click', () => {
     state.currentYear  = today.getFullYear();
     state.currentMonth = today.getMonth();
-    renderHeader();
-    renderGrid();
+    renderAll();
   });
 
   // Modal close buttons
@@ -476,9 +543,13 @@ function init() {
   seedSampleEvent();
   state.events = loadEvents();
   renderWeekdayRow();
-  renderHeader();
-  renderGrid();
+  renderAll();
   attachGlobalListeners();
+  // Wire sidebar Create button to open today's modal
+  const sidebarCreate = document.getElementById('btn-create-sidebar');
+  if (sidebarCreate) {
+    sidebarCreate.addEventListener('click', () => openModal(formatDate(today)));
+  }
   console.log('Calendar App loaded.');
 }
 
