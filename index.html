@@ -62,8 +62,8 @@
 
     <!-- Main calendar -->
     <main class="cal-main">
-      <div class="weekday-row" id="weekday-row"></div>
-      <div class="calendar-grid" id="calendar-grid"></div>
+      <div class="weekday-row" id="weekday-row" role="row" aria-hidden="true"></div>
+      <div class="calendar-grid" id="calendar-grid" role="grid"></div>
     </main>
 
   </div>
@@ -80,40 +80,44 @@
 
       <form class="modal-form" id="event-form" novalidate>
         <div class="form-group">
-          <label for="field-title">Title <span class="required">*</span></label>
-          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Add title" autocomplete="off" />
-          <span class="field-error" id="err-title"></span>
+          <label for="field-title">Title <span class="required" aria-hidden="true">*</span></label>
+          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Add title"
+                 autocomplete="off" required aria-required="true" aria-describedby="err-title" />
+          <span class="field-error" id="err-title" role="alert"></span>
         </div>
 
         <div class="form-group">
-          <label for="field-date">Date <span class="required">*</span></label>
-          <input type="date" id="field-date" name="date" />
-          <span class="field-error" id="err-date"></span>
+          <label for="field-date">Date <span class="required" aria-hidden="true">*</span></label>
+          <input type="date" id="field-date" name="date"
+                 required aria-required="true" aria-describedby="err-date" />
+          <span class="field-error" id="err-date" role="alert"></span>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label for="field-start">Start Time <span class="required">*</span></label>
-            <input type="time" id="field-start" name="startTime" />
-            <span class="field-error" id="err-start"></span>
+            <label for="field-start">Start Time <span class="required" aria-hidden="true">*</span></label>
+            <input type="time" id="field-start" name="startTime"
+                   required aria-required="true" aria-describedby="err-start" />
+            <span class="field-error" id="err-start" role="alert"></span>
           </div>
           <div class="form-group">
             <label for="field-end">End Time</label>
-            <input type="time" id="field-end" name="endTime" />
-            <span class="field-error" id="err-end"></span>
+            <input type="time" id="field-end" name="endTime" aria-describedby="err-end" />
+            <span class="field-error" id="err-end" role="alert"></span>
           </div>
         </div>
 
         <div class="form-group">
           <label for="field-desc">Description</label>
-          <textarea id="field-desc" name="description" maxlength="500" rows="3" placeholder="Add description"></textarea>
+          <textarea id="field-desc" name="description" maxlength="500" rows="3"
+                    placeholder="Add description" aria-describedby="desc-count err-desc"></textarea>
           <div class="char-counter"><span id="desc-count">0</span> / 500</div>
-          <span class="field-error" id="err-desc"></span>
+          <span class="field-error" id="err-desc" role="alert"></span>
         </div>
 
         <div class="form-group">
-          <label>Color</label>
-          <div class="color-swatches" id="color-swatches"></div>
+          <label id="color-label">Color</label>
+          <div class="color-swatches" id="color-swatches" role="group" aria-labelledby="color-label"></div>
         </div>
 
         <div class="modal-actions">
@@ -128,7 +132,7 @@
   </div>
 
   <!-- Toast -->
-  <div class="toast" id="toast" aria-live="polite"></div>
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
 
   <script src="app.js"></script>
 </body>

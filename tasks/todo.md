@@ -93,6 +93,60 @@
 
 ---
 
+## Accessibility Audit — Phase 10
+
+### A11y Issues Found
+
+#### Color Contrast (WCAG AA requires 4.5:1 for normal text)
+- `--gc-text-mid` (`#70757a`) on white = ~4.17:1 — **FAILS** at small sizes (labels 0.78rem, weekday cells 0.75rem, mini weekday 0.7rem, char counter 0.72rem)
+- `--gc-text-light` (`#9aa0a6`) on white = ~2.4:1 — **FAILS** (char counter, "other month" mini days)
+- Event chip white text on `#2ecc71` (green) = ~2.2:1 — **FAILS**
+- Event chip white text on `#f39c12` (orange) = ~2.0:1 — **FAILS**
+
+#### Semantic HTML / ARIA
+- Form inputs missing `aria-describedby` linking to error `<span>`s
+- Required inputs missing `required` attribute (only visual `*` asterisk)
+- Required `<span class="required">*</span>` needs `aria-hidden="true"`
+- Mini-calendar day buttons have bare number text — need full date `aria-label` (e.g., "March 5, 2026")
+- Mini-calendar weekday single letters ("S","M","T") are ambiguous — need `<abbr title="Sunday">`
+- `more-events` is a `<span>` with `cursor:pointer` but is not focusable or keyboard-operable
+- Color swatch buttons only expose hex code via `title` — need human-readable `aria-label` (e.g., "Blue")
+- `#color-swatches` label has no `for` or `aria-labelledby` linkage
+- Calendar grid missing `role="grid"` / `role="row"` / `role="gridcell"`
+- Today's cell missing `aria-current="date"`
+- Day cells missing `aria-label` with date + event count
+
+#### Focus States
+- No explicit `:focus-visible` ring on icon buttons, today pill, create button, mini-day, day-cell, swatches
+- Inputs use `outline: none` + `box-shadow` — valid but needs high-contrast mode fallback
+
+#### Keyboard Navigation
+- Day cells are `<div>` — not tab-focusable, no Enter/Space handler → mouse-only
+- `more-events` span — not tab-focusable
+- Modal has no focus trap — Tab can reach elements behind overlay
+- Modal close does not return focus to the triggering element
+
+#### Reduced Motion / Toast
+- CSS animations (`fadeIn`, `slideUp`, transitions) not wrapped in `prefers-reduced-motion`
+- Toast missing `aria-atomic="true"`
+
+---
+
+### Phase 10 Todo Checklist
+
+- [x] 10.1 **CSS — Color contrast**: Darkened `--gc-text-mid` → `#5f6368` (6.05:1) and `--gc-text-light` → `#6a6e73` (5.14:1)
+- [x] 10.2 **CSS — Event chip palette**: Replaced all 6 failing chip colors with accessible darker variants (all ≥ 4.67:1); added `COLOR_NAMES` map in JS
+- [x] 10.3 **CSS — Focus rings**: Added `:focus-visible` outlines for all interactive elements; added `prefers-reduced-motion` block
+- [x] 10.4 **HTML — Form ARIA**: Added `aria-describedby`, `required`, `aria-required` on required inputs; `role="alert"` on error spans; `aria-hidden` on asterisks; `role="group"` + `aria-labelledby` on color swatch container
+- [x] 10.5 **JS — Mini-calendar**: Added `aria-label` with full date on day buttons; wrapped weekday initials in `<abbr title="...">`
+- [x] 10.6 **JS — Color swatches**: Replaced hex `title` with human-readable `aria-label`; added `aria-pressed` state
+- [x] 10.7 **JS — `more-events`**: Changed from `<span>` to `<button type="button">`; added descriptive `aria-label`
+- [x] 10.8 **JS — Day cell keyboard**: Added `tabindex="0"` + `role="gridcell"` + Enter/Space handler; `aria-current="date"` on today; `aria-label` with date + event count; `role="grid"` on grid container
+- [x] 10.9 **JS — Modal focus trap + return**: Tab/Shift-Tab trapped inside modal; `modalTriggerEl` tracked and focus restored on close; `triggerEl` threaded through all callers
+- [x] 10.10 **HTML — Toast**: Added `aria-atomic="true"`
+
+---
+
 ## Review Section
 
 ### Changes Made

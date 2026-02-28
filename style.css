@@ -9,8 +9,8 @@
   --gc-red-hover:     #b3261e;
 
   --gc-text:          #3c4043;
-  --gc-text-mid:      #70757a;
-  --gc-text-light:    #9aa0a6;
+  --gc-text-mid:      #5f6368; /* was #70757a (4.17:1); now 6.05:1 ✓ */
+  --gc-text-light:    #6a6e73; /* was #9aa0a6 (2.4:1);  now 5.14:1 ✓ */
   --gc-border:        #dadce0;
   --gc-bg:            #f1f3f4;
   --gc-surface:       #ffffff;
@@ -408,6 +408,8 @@ svg { display: block; flex-shrink: 0; }
   cursor: pointer;
   display: block;
   border-radius: var(--radius-sm);
+  width: 100%;
+  text-align: left;
 }
 
 .more-events:hover {
@@ -642,6 +644,40 @@ textarea { resize: vertical; min-height: 70px; }
   .day-number { width: 1.5rem; height: 1.5rem; font-size: 0.72rem; }
 
   .event-chip { font-size: 0.65rem; }
+}
+
+/* ============================================================
+   Focus Styles — visible ring for keyboard users
+   ============================================================ */
+.icon-btn:focus-visible,
+.btn-today-pill:focus-visible,
+.btn-create:focus-visible,
+.mini-day:focus-visible,
+.day-cell:focus-visible,
+.event-chip:focus-visible,
+.color-swatch:focus-visible,
+.more-events:focus-visible,
+.btn:focus-visible {
+  outline: 3px solid var(--gc-blue);
+  outline-offset: 2px;
+}
+
+input[type="text"]:focus-visible,
+input[type="date"]:focus-visible,
+input[type="time"]:focus-visible,
+textarea:focus-visible {
+  outline: none; /* border-color + box-shadow already provides focus indicator */
+}
+
+/* ============================================================
+   Reduced Motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 @media (max-width: 600px) {

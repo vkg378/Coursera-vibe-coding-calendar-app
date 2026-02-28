@@ -10,16 +10,28 @@ const MONTH_NAMES = [
   'July', 'August', 'September', 'October', 'November', 'December'
 ];
 
+// All colours verified ≥ 4.5:1 contrast against white (#fff) for chip text.
 const COLOR_PALETTE = [
-  '#4a90e2', // blue (default)
-  '#e74c3c', // red
-  '#2ecc71', // green
-  '#f39c12', // orange
-  '#9b59b6', // purple
-  '#1abc9c', // teal
-  '#e91e63', // pink
-  '#607d8b', // grey-blue
+  '#1558d0', // blue   (6.06:1)
+  '#c0392b', // red    (5.44:1)
+  '#1e8449', // green  (4.71:1)
+  '#b45309', // amber  (5.02:1)
+  '#9b59b6', // purple (4.67:1)
+  '#0e7490', // teal   (5.36:1)
+  '#c2185b', // pink   (5.87:1)
+  '#455a64', // slate  (7.24:1)
 ];
+
+const COLOR_NAMES = {
+  '#1558d0': 'Blue',
+  '#c0392b': 'Red',
+  '#1e8449': 'Green',
+  '#b45309': 'Amber',
+  '#9b59b6': 'Purple',
+  '#0e7490': 'Teal',
+  '#c2185b': 'Pink',
+  '#455a64': 'Slate',
+};
 
 const STORAGE_KEY = 'calendarEvents';
 const MAX_CHIPS = 3;
@@ -140,10 +152,17 @@ function renderMiniCalendar() {
   // Weekday labels: S M T W T F S
   const wRow = document.createElement('div');
   wRow.className = 'mini-cal-weekdays';
-  ['S','M','T','W','T','F','S'].forEach(d => {
+  const MINI_WEEKDAYS = [
+    ['S', 'Sunday'], ['M', 'Monday'], ['T', 'Tuesday'], ['W', 'Wednesday'],
+    ['T', 'Thursday'], ['F', 'Friday'], ['S', 'Saturday'],
+  ];
+  MINI_WEEKDAYS.forEach(([letter, full]) => {
     const cell = document.createElement('span');
     cell.className = 'mini-wd';
-    cell.textContent = d;
+    const abbr = document.createElement('abbr');
+    abbr.title = full;
+    abbr.textContent = letter;
+    cell.appendChild(abbr);
     wRow.appendChild(cell);
   });
   container.appendChild(wRow);
@@ -157,6 +176,8 @@ function renderMiniCalendar() {
     if (date.getMonth() !== state.currentMonth) btn.classList.add('other-month');
     if (isToday(date)) btn.classList.add('today');
     btn.textContent = date.getDate();
+    btn.setAttribute('aria-label',
+      date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }));
     btn.addEventListener('click', () => {
       state.currentYear  = date.getFullYear();
       state.currentMonth = date.getMonth();
@@ -204,6 +225,7 @@ function renderGrid() {
       isToday(date)   ? 'today'       : '',
     ].filter(Boolean).join(' ');
 
+    cell.setAttribute('role', 'gridcell');
     cell.dataset.date = dateStr;
 
     // Day number
@@ -229,11 +251,38 @@ function renderGrid() {
       });
 
       if (overflow > 0) {
-        const more = document.createElement('span');
+        const more = document.createElement('button');
+        more.type = 'button';
         more.className = 'more-events';
         more.textContent = `+${overflow} more`;
+        more.setAttribute('aria-label',
+          `${overflow} more event${overflow === 1 ? '' : 's'} on ${formatDate(date)}`);
+        more.addEventListener('click', e => {
+          e.stopPropagation();
+          openModal(dateStr, more);
+        });
         cell.appendChild(more);
       }
+    }
+
+    // Keyboard + ARIA for current-month cells
+    if (isCurrentMonth) {
+      cell.setAttribute('tabindex', '0');
+      const dayEvents = getEventsForDate(dateStr);
+      const eventCount = dayEvents.length;
+      const dateLabel = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+      const eventLabel = eventCount === 0 ? 'No events'
+        : eventCount === 1 ? '1 event'
+        : `${eventCount} events`;
+      cell.setAttribute('aria-label', `${dateLabel}, ${eventLabel}`);
+      if (isToday(date)) cell.setAttribute('aria-current', 'date');
+
+      cell.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(dateStr, cell);
+        }
+      });
     }
 
     // Click on empty area of cell → add event
@@ -245,7 +294,9 @@ function renderGrid() {
 
 // ── 7. Modal Control ─────────────────────────────────────────
 
-function openModal(dateStr) {
+let modalTriggerEl = null;
+
+function openModal(dateStr, triggerEl) {
   state.modalMode = 'add';
   state.editingId = null;
 
@@ -258,10 +309,10 @@ function openModal(dateStr) {
   document.getElementById('field-date').value = dateStr || '';
   renderColorSwatches(COLOR_PALETTE[0]);
 
-  showOverlay();
+  showOverlay(triggerEl);
 }
 
-function openEditModal(event) {
+function openEditModal(event, triggerEl) {
   state.modalMode = 'edit';
   state.editingId = event.id;
 
@@ -273,16 +324,21 @@ function openEditModal(event) {
   populateForm(event);
   renderColorSwatches(event.color || COLOR_PALETTE[0]);
 
-  showOverlay();
+  showOverlay(triggerEl);
 }
 
 function closeModal() {
   document.getElementById('modal-overlay').hidden = true;
   state.modalMode = 'add';
   state.editingId = null;
+  if (modalTriggerEl) {
+    modalTriggerEl.focus();
+    modalTriggerEl = null;
+  }
 }
 
-function showOverlay() {
+function showOverlay(triggerEl) {
+  modalTriggerEl = triggerEl || null;
   document.getElementById('modal-overlay').hidden = false;
   document.getElementById('field-title').focus();
 }
@@ -381,14 +437,19 @@ function renderColorSwatches(selectedColor) {
   COLOR_PALETTE.forEach(color => {
     const swatch = document.createElement('button');
     swatch.type = 'button';
-    swatch.className = 'color-swatch' + (color === selectedColor ? ' selected' : '');
+    const isSelected = color === selectedColor;
+    swatch.className = 'color-swatch' + (isSelected ? ' selected' : '');
     swatch.style.background = color;
-    swatch.title = color;
+    const colorName = COLOR_NAMES[color] || color;
+    swatch.setAttribute('aria-label', colorName);
+    swatch.setAttribute('aria-pressed', String(isSelected));
     swatch.addEventListener('click', () => {
       state.selectedColor = color;
       container.querySelectorAll('.color-swatch').forEach(s => {
-        s.classList.toggle('selected', s.style.background === hexToRgb(color) ||
-                                        s.title === color);
+        const sColor = COLOR_PALETTE.find(c => (COLOR_NAMES[c] || c) === s.getAttribute('aria-label'));
+        const pressed = sColor === color;
+        s.classList.toggle('selected', pressed);
+        s.setAttribute('aria-pressed', String(pressed));
       });
     });
     container.appendChild(swatch);
@@ -423,14 +484,15 @@ function handleDayCellClick(e) {
   const dateStr = cell.dataset.date;
   // Only allow adding events on current-month cells
   if (cell.classList.contains('other-month')) return;
-  openModal(dateStr);
+  openModal(dateStr, cell);
 }
 
 function handleChipClick(e) {
   e.stopPropagation(); // prevent day cell click
-  const id = e.currentTarget.dataset.eventId;
+  const btn = e.currentTarget;
+  const id = btn.dataset.eventId;
   const event = getEventById(id);
-  if (event) openEditModal(event);
+  if (event) openEditModal(event, btn);
 }
 
 function handleFormSubmit(e) {
@@ -504,10 +566,29 @@ function attachGlobalListeners() {
     if (e.target === document.getElementById('modal-overlay')) closeModal();
   });
 
-  // Close on Escape
+  // Escape closes modal; Tab is trapped inside modal
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !document.getElementById('modal-overlay').hidden) {
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay.hidden) return;
+
+    if (e.key === 'Escape') {
       closeModal();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      const modal = document.getElementById('modal');
+      const focusable = Array.from(modal.querySelectorAll(
+        'button:not([hidden]), input, textarea, [tabindex="0"]'
+      )).filter(el => !el.disabled);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last  = focusable[focusable.length - 1];
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+      } else {
+        if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+      }
     }
   });
 
@@ -534,7 +615,7 @@ function seedSampleEvent() {
     startTime:   '09:00',
     endTime:     '09:30',
     description: 'Daily sync with the team.',
-    color:       '#4a90e2',
+    color:       COLOR_PALETTE[0],
   };
   saveEvents([sample]);
 }
@@ -548,7 +629,7 @@ function init() {
   // Wire sidebar Create button to open today's modal
   const sidebarCreate = document.getElementById('btn-create-sidebar');
   if (sidebarCreate) {
-    sidebarCreate.addEventListener('click', () => openModal(formatDate(today)));
+    sidebarCreate.addEventListener('click', () => openModal(formatDate(today), sidebarCreate));
   }
   console.log('Calendar App loaded.');
 }
