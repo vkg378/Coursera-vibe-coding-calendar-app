@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calendar App</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="app-header">
+      <h1 class="app-title">Calendar</h1>
+      <div class="nav-controls">
+        <button class="btn btn-icon" id="btn-prev" aria-label="Previous month">&#8249;</button>
+        <button class="btn btn-ghost" id="btn-today">Today</button>
+        <button class="btn btn-icon" id="btn-next" aria-label="Next month">&#8250;</button>
+      </div>
+      <div class="month-label" id="month-label"></div>
+    </header>
+
+    <!-- Calendar -->
+    <main class="calendar-container">
+      <!-- Weekday row -->
+      <div class="weekday-row" id="weekday-row"></div>
+      <!-- Day cells -->
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </main>
+  </div>
+
+  <!-- Modal overlay -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal" id="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Add Event</h2>
+        <button class="btn btn-icon modal-close" id="btn-modal-close" aria-label="Close modal">&times;</button>
+      </div>
+
+      <form class="modal-form" id="event-form" novalidate>
+        <!-- Title -->
+        <div class="form-group">
+          <label for="field-title">Title <span class="required">*</span></label>
+          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Event title" autocomplete="off" />
+          <span class="field-error" id="err-title"></span>
+        </div>
+
+        <!-- Date -->
+        <div class="form-group">
+          <label for="field-date">Date <span class="required">*</span></label>
+          <input type="date" id="field-date" name="date" />
+          <span class="field-error" id="err-date"></span>
+        </div>
+
+        <!-- Start / End Time -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="field-start">Start Time <span class="required">*</span></label>
+            <input type="time" id="field-start" name="startTime" />
+            <span class="field-error" id="err-start"></span>
+          </div>
+          <div class="form-group">
+            <label for="field-end">End Time</label>
+            <input type="time" id="field-end" name="endTime" />
+            <span class="field-error" id="err-end"></span>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="field-desc">Description</label>
+          <textarea id="field-desc" name="description" maxlength="500" rows="3" placeholder="Optional details..."></textarea>
+          <div class="char-counter"><span id="desc-count">0</span> / 500</div>
+          <span class="field-error" id="err-desc"></span>
+        </div>
+
+        <!-- Color -->
+        <div class="form-group">
+          <label>Color</label>
+          <div class="color-swatches" id="color-swatches"></div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-actions">
+          <button type="button" class="btn btn-danger" id="btn-delete" hidden>Delete</button>
+          <div class="modal-actions-right">
+            <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save">Save Event</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
