@@ -4,17 +4,48 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calendar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'gc-blue':        '#1a73e8',
+            'gc-blue-hover':  '#1765cc',
+            'gc-blue-light':  '#e8f0fe',
+            'gc-red':         '#d93025',
+            'gc-red-hover':   '#b3261e',
+            'gc-text':        '#3c4043',
+            'gc-text-mid':    '#5f6368',
+            'gc-text-light':  '#6a6e73',
+            'gc-border':      '#dadce0',
+            'gc-bg':          '#f1f3f4',
+            'gc-surface':     '#ffffff',
+            'gc-hover':       '#f1f3f4',
+            'gc-today':       '#1a73e8',
+          },
+          fontFamily: {
+            sans: ["'Google Sans'", "'Segoe UI'", 'Roboto', 'Arial', 'sans-serif'],
+          },
+          width: { sidebar: '256px' },
+          minWidth: { sidebar: '256px' },
+          height: { topbar: '64px' },
+        },
+      },
+    }
+  </script>
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="font-sans bg-gc-bg text-gc-text h-screen flex flex-col overflow-hidden">
 
   <!-- ── Top Bar ─────────────────────────────────────────── -->
-  <header class="topbar">
-    <div class="topbar-start">
-      <button class="icon-btn" id="btn-menu" aria-label="Main menu">
+  <header class="h-topbar bg-gc-surface border-b border-gc-border flex items-center px-3 gap-2 sticky top-0 z-[100] shrink-0">
+    <div class="flex items-center gap-1 min-w-sidebar">
+      <button class="icon-btn inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              id="btn-menu" aria-label="Main menu">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" fill="currentColor"/></svg>
       </button>
-      <div class="logo">
+      <div class="flex items-center gap-1.5 ml-0.5">
         <svg width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
           <rect x="1" y="5" width="34" height="30" rx="3" fill="white" stroke="#dadce0"/>
           <rect x="1" y="5" width="34" height="11" rx="3" fill="#1a73e8"/>
@@ -23,108 +54,197 @@
           <rect x="22" y="1" width="4" height="9" rx="2" fill="#4285f4"/>
           <text x="18" y="30" text-anchor="middle" font-size="11" font-weight="700" fill="#1a73e8" font-family="sans-serif">CAL</text>
         </svg>
-        <span class="logo-text">Calendar</span>
+        <span class="text-[1.35rem] font-normal text-gc-text-mid tracking-tight max-md:hidden">Calendar</span>
       </div>
     </div>
 
-    <div class="topbar-mid">
-      <button class="btn-today-pill" id="btn-today">Today</button>
-      <button class="icon-btn nav-arrow" id="btn-prev" aria-label="Previous month">
+    <div class="flex items-center gap-1 flex-1">
+      <button class="h-9 px-4 border border-gc-border rounded-full text-sm font-medium text-gc-text bg-gc-surface hover:bg-gc-hover hover:shadow-sm transition-all focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              id="btn-today">Today</button>
+      <button class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              id="btn-prev" aria-label="Previous month">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
       </button>
-      <button class="icon-btn nav-arrow" id="btn-next" aria-label="Next month">
+      <button class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              id="btn-next" aria-label="Next month">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
       </button>
-      <h1 class="topbar-month" id="month-label"></h1>
+      <h1 class="text-[1.35rem] font-normal text-gc-text ml-1 whitespace-nowrap max-md:text-[1.05rem]"
+          id="month-label"></h1>
     </div>
 
-    <div class="topbar-end">
-      <button class="icon-btn" aria-label="Search">
+    <div class="flex items-center gap-0.5 ml-auto">
+      <button class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              aria-label="Search">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
       </button>
-      <button class="icon-btn" aria-label="Settings">
+      <button class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors shrink-0 focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              aria-label="Settings">
         <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg>
       </button>
     </div>
   </header>
 
   <!-- ── App Body ───────────────────────────────────────── -->
-  <div class="app-body">
+  <div class="flex flex-1 overflow-hidden">
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <button class="btn-create" id="btn-create-sidebar">
-        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
+    <aside class="w-sidebar shrink-0 bg-gc-surface px-3 pt-3 pb-4 overflow-y-auto flex flex-col gap-4 max-md:hidden"
+           id="sidebar">
+      <button class="btn-create inline-flex items-center gap-2.5 px-5 py-3.5 rounded-[24px] bg-gc-surface shadow-[0_1px_2px_0_rgba(60,64,67,.3),0_1px_3px_1px_rgba(60,64,67,.15)] text-[0.9rem] font-medium text-gc-text hover:bg-gc-blue-light hover:shadow-md transition-all w-fit focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+              id="btn-create-sidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" class="text-gc-blue"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" fill="currentColor"/></svg>
         <span>Create</span>
       </button>
-      <div class="mini-cal" id="mini-cal"></div>
+      <div class="px-1" id="mini-cal"></div>
     </aside>
 
     <!-- Main calendar -->
-    <main class="cal-main">
-      <div class="weekday-row" id="weekday-row" role="row" aria-hidden="true"></div>
-      <div class="calendar-grid" id="calendar-grid" role="grid"></div>
+    <main class="flex-1 flex flex-col overflow-hidden bg-gc-surface border-l border-gc-border">
+      <div class="grid grid-cols-7 border-b border-gc-border shrink-0 bg-gc-surface"
+           id="weekday-row" role="row" aria-hidden="true"></div>
+      <div class="calendar-grid grid grid-cols-7 flex-1 overflow-y-auto"
+           id="calendar-grid" role="grid"></div>
     </main>
 
   </div>
 
   <!-- ── Event Modal ────────────────────────────────────── -->
-  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
-    <div class="modal" id="modal">
-      <div class="modal-header">
-        <h2 class="modal-title" id="modal-title">Add Event</h2>
-        <button class="icon-btn modal-close" id="btn-modal-close" aria-label="Close modal">
+  <div class="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000] p-4 animate-[fadeIn_0.15s_ease] max-sm:items-end max-sm:p-0"
+       id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="bg-gc-surface rounded-2xl shadow-[0_1px_3px_0_rgba(60,64,67,.3),0_4px_8px_3px_rgba(60,64,67,.15)] w-full max-w-[460px] max-h-[90vh] overflow-y-auto animate-[slideUp_0.18s_ease] max-sm:rounded-b-none max-sm:max-w-full max-sm:max-h-[88vh]"
+         id="modal">
+      <div class="flex items-center justify-between px-6 pt-5 pb-1">
+        <h2 class="text-base font-medium text-gc-text" id="modal-title">Add Event</h2>
+        <button class="inline-flex items-center justify-center w-10 h-10 rounded-full text-gc-text-mid hover:bg-gc-hover hover:text-gc-text transition-colors focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+                id="btn-modal-close" aria-label="Close modal">
           <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
         </button>
       </div>
 
-      <form class="modal-form" id="event-form" novalidate>
-        <div class="form-group">
-          <label for="field-title">Title <span class="required" aria-hidden="true">*</span></label>
-          <input type="text" id="field-title" name="title" maxlength="100" placeholder="Add title"
+      <form class="px-6 pb-6 pt-3 flex flex-col gap-[0.85rem]" id="event-form" novalidate>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide" for="field-title">Title <span class="text-gc-red" aria-hidden="true">*</span></label>
+          <input class="w-full px-2.5 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-[0.9rem] transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)]"
+                 type="text" id="field-title" name="title" maxlength="100" placeholder="Add title"
                  autocomplete="off" required aria-required="true" aria-describedby="err-title" />
-          <span class="field-error" id="err-title" role="alert"></span>
+          <span class="text-[0.75rem] text-gc-red min-h-[1em] block" id="err-title" role="alert"></span>
         </div>
 
-        <div class="form-group">
-          <label for="field-date">Date <span class="required" aria-hidden="true">*</span></label>
-          <input type="date" id="field-date" name="date"
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide" for="field-date">Date <span class="text-gc-red" aria-hidden="true">*</span></label>
+          <input class="w-full px-2.5 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-[0.9rem] transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)]"
+                 type="date" id="field-date" name="date"
                  required aria-required="true" aria-describedby="err-date" />
-          <span class="field-error" id="err-date" role="alert"></span>
+          <span class="text-[0.75rem] text-gc-red min-h-[1em] block" id="err-date" role="alert"></span>
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label for="field-start">Start Time <span class="required" aria-hidden="true">*</span></label>
-            <input type="time" id="field-start" name="startTime"
-                   required aria-required="true" aria-describedby="err-start" />
-            <span class="field-error" id="err-start" role="alert"></span>
+        <div class="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
+          <!-- Start Time -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide">
+              Start Time <span class="text-gc-red" aria-hidden="true">*</span>
+            </label>
+            <div class="flex gap-1.5" id="field-start-wrap" aria-label="Start time" role="group">
+              <select id="field-start-hour"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="Start hour" aria-describedby="err-start">
+                <option value="">HH</option>
+                <option value="1">1</option><option value="2">2</option>
+                <option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option>
+                <option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option>
+                <option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="field-start-min"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="Start minute" aria-describedby="err-start">
+                <option value="">MM</option>
+                <option value="00">00</option><option value="05">05</option>
+                <option value="10">10</option><option value="15">15</option>
+                <option value="20">20</option><option value="25">25</option>
+                <option value="30">30</option><option value="35">35</option>
+                <option value="40">40</option><option value="45">45</option>
+                <option value="50">50</option><option value="55">55</option>
+              </select>
+              <select id="field-start-ampm"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="Start AM or PM" aria-describedby="err-start">
+                <option value="">AM/PM</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+            <span class="text-[0.75rem] text-gc-red min-h-[1em] block" id="err-start" role="alert"></span>
           </div>
-          <div class="form-group">
-            <label for="field-end">End Time</label>
-            <input type="time" id="field-end" name="endTime" aria-describedby="err-end" />
-            <span class="field-error" id="err-end" role="alert"></span>
+
+          <!-- End Time -->
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide">
+              End Time
+            </label>
+            <div class="flex gap-1.5" id="field-end-wrap" aria-label="End time" role="group">
+              <select id="field-end-hour"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="End hour" aria-describedby="err-end">
+                <option value="">HH</option>
+                <option value="1">1</option><option value="2">2</option>
+                <option value="3">3</option><option value="4">4</option>
+                <option value="5">5</option><option value="6">6</option>
+                <option value="7">7</option><option value="8">8</option>
+                <option value="9">9</option><option value="10">10</option>
+                <option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="field-end-min"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="End minute" aria-describedby="err-end">
+                <option value="">MM</option>
+                <option value="00">00</option><option value="05">05</option>
+                <option value="10">10</option><option value="15">15</option>
+                <option value="20">20</option><option value="25">25</option>
+                <option value="30">30</option><option value="35">35</option>
+                <option value="40">40</option><option value="45">45</option>
+                <option value="50">50</option><option value="55">55</option>
+              </select>
+              <select id="field-end-ampm"
+                      class="flex-1 min-w-0 px-2 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-sm transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] cursor-pointer"
+                      aria-label="End AM or PM" aria-describedby="err-end">
+                <option value="">AM/PM</option>
+                <option value="AM">AM</option>
+                <option value="PM">PM</option>
+              </select>
+            </div>
+            <span class="text-[0.75rem] text-gc-red min-h-[1em] block" id="err-end" role="alert"></span>
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="field-desc">Description</label>
-          <textarea id="field-desc" name="description" maxlength="500" rows="3"
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide" for="field-desc">Description</label>
+          <textarea class="w-full px-2.5 py-2 border border-gc-border rounded-lg text-gc-text bg-gc-surface text-[0.9rem] transition-[border-color,box-shadow] focus:outline-none focus:border-gc-blue focus:shadow-[0_0_0_2px_rgba(26,115,232,0.2)] resize-y min-h-[70px]"
+                    id="field-desc" name="description" maxlength="500" rows="3"
                     placeholder="Add description" aria-describedby="desc-count err-desc"></textarea>
-          <div class="char-counter"><span id="desc-count">0</span> / 500</div>
-          <span class="field-error" id="err-desc" role="alert"></span>
+          <div class="text-[0.72rem] text-gc-text-light text-right"><span id="desc-count">0</span> / 500</div>
+          <span class="text-[0.75rem] text-gc-red min-h-[1em] block" id="err-desc" role="alert"></span>
         </div>
 
-        <div class="form-group">
-          <label id="color-label">Color</label>
-          <div class="color-swatches" id="color-swatches" role="group" aria-labelledby="color-label"></div>
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[0.78rem] font-medium text-gc-text-mid uppercase tracking-wide" id="color-label">Color</label>
+          <div class="flex gap-[0.45rem] flex-wrap" id="color-swatches"
+               role="group" aria-labelledby="color-label"></div>
         </div>
 
-        <div class="modal-actions">
-          <button type="button" class="btn btn-danger" id="btn-delete" hidden>Delete</button>
-          <div class="modal-actions-right">
-            <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
-            <button type="submit" class="btn btn-primary" id="btn-save">Save</button>
+        <div class="flex items-center pt-3 border-t border-gc-border mt-1">
+          <button type="button"
+                  class="inline-flex items-center justify-center px-4 py-[0.45rem] rounded-lg text-sm font-medium bg-gc-red text-white hover:bg-gc-red-hover transition-colors focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+                  id="btn-delete" hidden>Delete</button>
+          <div class="flex gap-1.5 ml-auto">
+            <button type="button"
+                    class="inline-flex items-center justify-center px-4 py-[0.45rem] rounded-lg text-sm font-medium text-gc-blue bg-transparent hover:bg-gc-blue-light transition-colors focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+                    id="btn-cancel">Cancel</button>
+            <button type="submit"
+                    class="inline-flex items-center justify-center px-4 py-[0.45rem] rounded-lg text-sm font-medium bg-gc-blue text-white hover:bg-gc-blue-hover transition-colors focus-visible:outline-2 focus-visible:outline-gc-blue focus-visible:outline-offset-2"
+                    id="btn-save">Save</button>
           </div>
         </div>
       </form>
@@ -132,7 +252,8 @@
   </div>
 
   <!-- Toast -->
-  <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
+  <div class="toast fixed bottom-6 left-1/2 -translate-x-1/2 bg-[#3c4043] text-white px-5 py-2.5 rounded-full text-sm shadow-lg z-[2000] pointer-events-none opacity-0 transition-[opacity,transform] duration-200"
+       id="toast" aria-live="polite" aria-atomic="true"></div>
 
   <script src="app.js"></script>
 </body>

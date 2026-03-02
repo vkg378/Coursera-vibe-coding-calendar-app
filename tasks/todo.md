@@ -147,6 +147,70 @@
 
 ---
 
+## Phase 11: TailwindCSS Migration
+
+### Plan
+
+**Approach:** Use the Tailwind Play CDN (no build tools needed for vanilla HTML project).
+Migrate static HTML classes in `index.html`, dynamic classes in `app.js`, and trim `style.css`
+to only the styles Tailwind can't handle (keyframe animations, `grid-auto-rows: 1fr`,
+toast show/hide toggle, `.invalid` border toggle).
+
+**File changes:**
+- `index.html` — add Tailwind CDN + config block; replace all class attributes with Tailwind utilities
+- `app.js` — replace all `.className` and `.classList` strings with Tailwind utilities
+- `style.css` — keep only: `@keyframes fadeIn/slideUp`, `grid-auto-rows: 1fr`, `.toast.show`,
+  `.invalid` border, `[hidden]` override, and `prefers-reduced-motion` block
+
+### Checklist
+
+- [x] 11.1 Add Tailwind Play CDN and custom theme config (`gc-*` color tokens) to `index.html`
+- [x] 11.2 Migrate `index.html` — topbar (header, logo, nav buttons)
+- [x] 11.3 Migrate `index.html` — app-body, sidebar, modal, toast
+- [x] 11.4 Migrate `app.js` — `renderMiniCalendar()` class strings
+- [x] 11.5 Migrate `app.js` — `renderWeekdayRow()` and `renderGrid()` class strings
+- [x] 11.6 Migrate `app.js` — `renderColorSwatches()` and `toggleInvalid()` class strings
+- [x] 11.7 Trim `style.css` to minimal residual styles only (~35 lines)
+
+### Bugs Fixed During Migration (from code-review-specialist)
+- [x] `today` frozen at page load → replaced with `getToday()` lazy function
+- [x] `+N more` click opened wrong modal → now opens first overflow event in edit modal
+- [x] `loadEvents()` had no schema validation → added `isValidEvent()` filter
+- [x] Delete had no confirmation → added `confirm()` dialog
+- [x] Duplicate `getEventsForDate()` calls per cell → merged into single call
+- [x] Dead `hexToRgb` function → removed
+- [x] `console.log` in `init()` → removed
+- [x] `more-events` aria-label used ISO date → switched to human-readable date
+- [x] Color swatch selection used fragile aria-label reverse-lookup → uses `data-color` attribute now
+- [x] `document.title` never updated → now shows "Month Year — Calendar"
+
+---
+
+## Phase 12: Custom Time Picker Dropdowns
+
+### Plan
+
+Replace `<input type="time">` for Start Time and End Time with three `<select>` dropdowns each:
+**Hour** (1–12) · **Minute** (00, 05, 10 … 55 in 5-min steps) · **AM/PM**
+
+Storage format stays as `HH:MM` 24-hour strings (unchanged from existing events in localStorage).
+
+**File changes:**
+- `index.html` — swap two `<input type="time">` for two sets of three `<select>` elements
+- `app.js` — add `getTimeValue(prefix)` and `setTimeValue(prefix, timeStr)` helpers;
+  update `readForm()`, `populateForm()`, `clearForm()`, and `toggleInvalid()`
+
+### Checklist
+
+- [x] 12.1 Replace `<input type="time">` elements in `index.html` with styled `<select>` groups
+- [x] 12.2 Add `getTimeValue(prefix)` — reads three selects → returns `HH:MM` 24h string or `''`
+- [x] 12.3 Add `setTimeValue(prefix, timeStr)` — parses `HH:MM` 24h → populates three selects
+- [x] 12.4 Update `readForm()` to call `getTimeValue` instead of `.value` on removed inputs
+- [x] 12.5 Update `populateForm()` to call `setTimeValue` for start/end times
+- [x] 12.6 Update `toggleInvalid()` to mark each of the three selects invalid for time fields
+
+---
+
 ## Review Section
 
 ### Changes Made
