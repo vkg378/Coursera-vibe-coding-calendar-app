@@ -1,0 +1,1 @@
+Review the current app for accessability (ally) best practices.  Check color contrasts, semantic HTML, ARIA labels, focus states, and keyboard navigation. Suggest improvements and provide code patches where needed. 
